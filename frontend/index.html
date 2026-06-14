@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/vite.svg">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00D2FF">
+<title>EyeTrust AI — Advanced Eye Disease Detection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #040C18;
+  --surface: #071525;
+  --card: #0A1D34;
+  --border: rgba(0,210,255,0.12);
+  --border-hover: rgba(0,210,255,0.35);
+  --cyan: #00D2FF;
+  --cyan-dim: rgba(0,210,255,0.08);
+  --cyan-glow: rgba(0,210,255,0.25);
+  --purple: #A855F7;
+  --purple-dim: rgba(168,85,247,0.1);
+  --green: #00F5A0;
+  --green-dim: rgba(0,245,160,0.1);
+  --red: #FF3D5E;
+  --red-dim: rgba(255,61,94,0.1);
+  --amber: #FFB800;
+  --text: #D6EEFF;
+  --text-muted: rgba(214,238,255,0.5);
+  --text-faint: rgba(214,238,255,0.22);
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Outfit', sans-serif;
+  --display: 'Rajdhani', sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,210,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,210,255,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(0,210,255,0.04) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(168,85,247,0.04) 0%,transparent 50%);pointer-events:none;z-index:0;animation:bgPulse 12s ease-in-out infinite alternate;}
+@keyframes bgPulse{0%{opacity:.6}100%{opacity:1}}
+
+/* NAVBAR */
+.navbar{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:70px;background:rgba(4,12,24,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:12px;cursor:pointer;}
+.logo-eye{width:36px;height:36px;}
+.logo-eye svg{width:100%;height:100%;}
+.logo-text{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:2px;color:var(--text);}
+.logo-text span{color:var(--cyan);}
+.logo-version{font-family:var(--mono);font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-top:2px;}
+.nav-links{display:flex;gap:6px;align-items:center;}
+.nav-btn{display:flex;align-items:center;gap:7px;padding:8px 20px;border-radius:6px;font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:.5px;cursor:pointer;transition:all .2s;border:1px solid transparent;text-transform:uppercase;background:transparent;color:var(--text-muted);}
+.nav-btn:hover{color:var(--text);background:rgba(255,255,255,.04);border-color:var(--border);}
+.nav-btn.active{color:var(--cyan);background:var(--cyan-dim);border-color:var(--border-hover);}
+.nav-cta{background:linear-gradient(135deg,rgba(0,210,255,.15),rgba(168,85,247,.15));color:var(--cyan);border-color:var(--border-hover);}
+.nav-cta:hover{background:linear-gradient(135deg,rgba(0,210,255,.25),rgba(168,85,247,.25));transform:translateY(-1px);}
+
+/* LAYOUT */
+.container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px;}
+.page{display:none;}
+.page.active{display:block;animation:pageIn .4s ease;}
+@keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{padding:100px 0 70px;text-align:center;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--cyan);background:var(--cyan-dim);border:1px solid var(--border-hover);padding:6px 16px;border-radius:100px;margin-bottom:28px;text-transform:uppercase;}
+.hero-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero h1{font-family:var(--display);font-size:clamp(42px,7vw,78px);font-weight:700;line-height:1.05;letter-spacing:1px;margin-bottom:22px;}
+.hero h1 .c{color:var(--cyan);}
+.hero h1 .p{color:var(--purple);}
+.hero-sub{font-size:17px;color:var(--text-muted);max-width:540px;margin:0 auto 42px;line-height:1.7;font-weight:300;}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:8px;font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:all .25s;border:none;text-transform:uppercase;}
+.btn-cyan{background:var(--cyan);color:#040C18;box-shadow:0 0 30px rgba(0,210,255,.3);}
+.btn-cyan:hover{background:#33DBFF;transform:translateY(-2px);box-shadow:0 0 45px rgba(0,210,255,.45);}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border-hover);}
+.btn-outline:hover{background:rgba(255,255,255,.04);transform:translateY(-1px);}
+.btn-purple{background:linear-gradient(135deg,#A855F7,#7C3AED);color:#fff;box-shadow:0 0 30px rgba(168,85,247,.3);}
+.btn-purple:hover{transform:translateY(-2px);box-shadow:0 0 45px rgba(168,85,247,.45);}
+.btn-sm{padding:10px 20px;font-size:12px;}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,61,94,.3);}
+.btn-danger:hover{background:rgba(255,61,94,.18);transform:translateY(-1px);}
+
+/* STAT BAR */
+.stat-bar{display:flex;justify-content:center;gap:0;margin-top:70px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);}
+.stat-item{flex:1;padding:28px 24px;text-align:center;border-right:1px solid var(--border);position:relative;}
+.stat-item:last-child{border-right:none;}
+.stat-item::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--cyan);transition:width .4s ease;}
+.stat-item:hover::after{width:60%;}
+.stat-num{font-family:var(--display);font-size:36px;font-weight:700;color:var(--cyan);line-height:1;display:block;}
+.stat-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:6px;display:block;font-family:var(--mono);}
+
+/* DISEASE GRID */
+.section-header{margin-bottom:32px;}
+.mono-label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--text-faint);text-transform:uppercase;}
+.section-title{font-family:var(--display);font-size:28px;font-weight:700;letter-spacing:1px;margin-top:10px;}
+.disease-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin-top:24px;}
+.disease-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 20px;transition:all .3s;cursor:default;position:relative;overflow:hidden;}
+.disease-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--dc-accent,var(--cyan));transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
+.disease-card:hover{border-color:var(--border-hover);transform:translateY(-3px);}
+.disease-card:hover::before{transform:scaleX(1);}
+.disease-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+.disease-name{font-family:var(--display);font-size:16px;font-weight:600;letter-spacing:.5px;margin-bottom:6px;}
+.disease-desc{font-size:12px;color:var(--text-muted);line-height:1.5;}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:60px 0;}
+@media(max-width:700px){.features-grid{grid-template-columns:1fr;}}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 24px;transition:all .3s;}
+.feature-card:hover{border-color:var(--border-hover);transform:translateY(-4px);}
+.feature-icon{font-size:28px;margin-bottom:16px;display:block;}
+.feature-title{font-family:var(--display);font-size:18px;font-weight:600;letter-spacing:.5px;margin-bottom:8px;}
+.feature-desc{font-size:13px;color:var(--text-muted);line-height:1.7;font-weight:300;}
+
+/* PAGE HEADER */
+.page-header{padding:36px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-header h2{font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:1px;margin-top:8px;}
+.separator{height:1px;background:var(--border);margin:24px 0;}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:5px 14px;border-radius:100px;border:1px solid var(--border);color:var(--text-faint);text-transform:uppercase;}
+
+/* DETECTION LAYOUT */
+.detection-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:0 0 40px;}
+@media(max-width:800px){.detection-layout{grid-template-columns:1fr;}}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;height:100%;}
+.panel-header{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.panel-title{font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);flex-shrink:0;}
+.panel-dot.green{background:var(--green);box-shadow:0 0 8px var(--green);}
+.panel-dot.red{background:var(--red);box-shadow:0 0 8px var(--red);}
+.panel-dot.purple{background:var(--purple);box-shadow:0 0 8px var(--purple);}
+.panel-dot.amber{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+.panel-dot.dim{background:var(--text-faint);box-shadow:none;}
+.panel-body{padding:22px;}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed rgba(0,210,255,.22);border-radius:12px;padding:50px 24px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;background:rgba(0,210,255,.015);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.upload-zone::before{content:'';position:absolute;inset:0;background:linear-gradient(45deg,transparent 30%,rgba(0,210,255,.025) 50%,transparent 70%);animation:scanMove 3s linear infinite;}
+@keyframes scanMove{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.upload-zone:hover{border-color:rgba(0,210,255,.5);background:rgba(0,210,255,.035);}
+.uz-icon{width:64px;height:64px;border-radius:16px;background:var(--cyan-dim);border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;font-size:26px;animation:floatIcon 3s ease-in-out infinite;}
+@keyframes floatIcon{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.uz-title{font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:.5px;}
+.uz-sub{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.format-badges{display:flex;gap:8px;justify-content:center;}
+.fmt-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:100px;background:var(--card);border:1px solid var(--border);color:var(--text-muted);letter-spacing:1px;}
+
+/* PREVIEW / RESULT IMAGE */
+img.preview{width:100%;max-height:300px;object-fit:cover;display:block;border-radius:10px;}
+.preview-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.preview-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--purple));z-index:2;}
+.result-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.scan-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scan 2.2s ease-in-out infinite;z-index:2;}
+@keyframes scan{0%{top:0;opacity:1}90%{top:100%;opacity:1}100%{top:100%;opacity:0}}
+.corner{position:absolute;width:18px;height:18px;border-color:var(--cyan);border-style:solid;opacity:.7;z-index:3;}
+.c-tl{top:8px;left:8px;border-width:2px 0 0 2px;}
+.c-tr{top:8px;right:8px;border-width:2px 2px 0 0;}
+.c-bl{bottom:8px;left:8px;border-width:0 0 2px 2px;}
+.c-br{bottom:8px;right:8px;border-width:0 2px 2px 0;}
+
+/* SCAN ANIMATION */
+.scan-container{text-align:center;padding:60px 20px;}
+.scan-ring{width:100px;height:100px;margin:0 auto 24px;position:relative;}
+.scan-ring svg{width:100%;height:100%;animation:rotateScan 1.8s linear infinite;}
+@keyframes rotateScan{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.scan-inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:26px;}
+.scan-label{font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:1px;margin-bottom:8px;}
+.scan-sub{font-family:var(--mono);font-size:12px;color:var(--text-muted);animation:scanText .8s ease-in-out infinite alternate;}
+@keyframes scanText{0%{opacity:.4}100%{opacity:1}}
+
+/* DIAGNOSIS BADGE */
+.diag-badge{display:flex;align-items:center;gap:12px;padding:16px 18px;border-radius:10px;margin-bottom:18px;border:1px solid;}
+.diag-badge.normal{background:var(--green-dim);border-color:rgba(0,245,160,.25);}
+.diag-badge.abnormal{background:var(--red-dim);border-color:rgba(255,61,94,.25);}
+.diag-icon{font-size:22px;}
+.diag-name{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:1px;line-height:1;}
+.diag-status{font-family:var(--mono);font-size:11px;letter-spacing:1px;margin-top:4px;}
+.normal .diag-name{color:var(--green);}
+.normal .diag-status{color:rgba(0,245,160,.6);}
+.abnormal .diag-name{color:var(--red);}
+.abnormal .diag-status{color:rgba(255,61,94,.6);}
+
+/* CONFIDENCE BAR */
+.conf-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;}
+.conf-track{height:8px;background:rgba(255,255,255,.05);border-radius:100px;overflow:hidden;margin-bottom:18px;border:1px solid var(--border);}
+.conf-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:100px;width:0;transition:width 1.2s cubic-bezier(.22,1,.36,1);position:relative;}
+.conf-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:5px;background:#fff;border-radius:100px;opacity:.5;}
+
+/* PROB GRID */
+.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.prob-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 14px;transition:border-color .2s;}
+.prob-item:hover{border-color:var(--border-hover);}
+.prob-item.hl{border-color:var(--border-hover);background:rgba(0,210,255,.05);}
+.pi-name{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-family:var(--mono);}
+.pi-val{font-family:var(--display);font-size:20px;font-weight:700;}
+.prob-item.hl .pi-val{color:var(--cyan);}
+
+/* ADVICE BOX */
+.advice-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:18px;}
+.advice-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);}
+.advice-body{font-size:13px;line-height:1.8;color:var(--text-muted);font-weight:300;}
+
+/* ACTION ROW */
+.action-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
+
+/* EMPTY STATE */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:12px;text-align:center;}
+
+/* CHAT PAGE */
+.chat-wrap{max-width:780px;margin:0 auto;padding-bottom:40px;}
+.chat-window{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.chat-messages{height:480px;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:16px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.chat-messages::-webkit-scrollbar{width:4px;}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:4px;}
+.msg{display:flex;gap:10px;animation:msgIn .3s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse;}
+.msg-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);}
+.msg-av.bot{background:var(--cyan-dim);border-color:var(--border-hover);}
+.msg-av.user{background:var(--purple-dim);border-color:rgba(168,85,247,.3);}
+.msg-bubble{max-width:75%;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.7;font-weight:300;}
+.msg.bot .msg-bubble{background:var(--card);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px;}
+.msg.user .msg-bubble{background:linear-gradient(135deg,rgba(0,210,255,.14),rgba(168,85,247,.14));border:1px solid var(--border-hover);color:var(--text);border-bottom-right-radius:4px;}
+.chat-input-row{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid var(--border);background:var(--card);}
+.chat-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 15px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s;}
+.chat-input::placeholder{color:var(--text-faint);}
+.chat-input:focus{border-color:var(--border-hover);}
+.voice-btn{width:42px;height:42px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.voice-btn:hover{border-color:var(--border-hover);color:var(--text);}
+.voice-btn.listening{background:rgba(255,61,94,.1);border-color:rgba(255,61,94,.4);animation:vpulse 1s ease-in-out infinite;}
+@keyframes vpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,61,94,.3)}50%{box-shadow:0 0 0 8px rgba(255,61,94,0)}}
+
+/* FOOTER */
+.footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-top:60px;}
+.footer-logo{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text-muted);}
+.footer-logo span{color:var(--cyan);}
+.footer-copy{font-family:var(--mono);font-size:11px;color:var(--text-faint);}
+.footer-left{display:flex;align-items:center;gap:12px;}
+.footer-disc{font-size:12px;color:var(--text-faint);max-width:400px;text-align:right;line-height:1.5;}
+.footer-disc strong{color:var(--amber);}
+.mt16{margin-top:16px;}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-eye">
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="18" rx="15" ry="9.5" stroke="#00D2FF" stroke-width="1.4"/>
+        <circle cx="18" cy="18" r="5.5" stroke="#00D2FF" stroke-width="1.4"/>
+        <circle cx="18" cy="18" r="2.3" fill="#00D2FF"/>
+        <line x1="3" y1="18" x2="8" y2="18" stroke="#00D2FF" stroke-width="1" opacity="0.4"/>
+        <line x1="28" y1="18" x2="33" y2="18" stroke="#00D2FF" stroke-width="1" opacity="0.4"/>
+        <line x1="18" y1="8.5" x2="18" y2="5.5" stroke="#00D2FF" stroke-width="1" opacity="0.3"/>
+        <line x1="18" y1="27.5" x2="18" y2="30.5" stroke="#00D2FF" stroke-width="1" opacity="0.3"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">EYE<span>TRUST</span></div>
+      <div class="logo-version">AI — v2.0</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" id="navHome" onclick="showPage('home')">⌂ &nbsp;Home</button>
+    <button class="nav-btn" id="navDetection" onclick="showPage('detection')">◎ &nbsp;Detection</button>
+    <button class="nav-btn nav-cta" id="navChat" onclick="showPage('chat')">✦ &nbsp;AI Doctor</button>
+  </div>
+</nav>
+
+<!-- ═══ HOME ═══ -->
+<div id="home" class="page active">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-tag">
+        <div class="hero-tag-dot"></div>
+        System Online — MobileNetV2 Model Loaded
+      </div>
+      <h1>
+        Detect Eye Disease<br>
+        with <span class="c">AI Precision</span>
+      </h1>
+      <p class="hero-sub">Upload a retinal image and receive an instant diagnosis powered by a deep learning model trained on thousands of clinical eye images.</p>
+      <div class="hero-actions">
+        <button class="btn btn-cyan" onclick="showPage('detection')">◎ &nbsp;Start Free Analysis</button>
+        <button class="btn btn-outline" onclick="showPage('chat')">✦ &nbsp;Chat with AI Doctor</button>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-item">
+          <span class="stat-num">95%<span style="font-size:16px;color:var(--text-muted)">+</span></span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">5</span>
+          <span class="stat-label">Conditions</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">&lt;3s</span>
+          <span class="stat-label">Scan Time</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">AI</span>
+          <span class="stat-label">Powered</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="mono-label">01 — Detectable Conditions</div>
+      <div class="section-title">What We Can Detect</div>
+    </div>
+    <div class="disease-grid">
+      <div class="disease-card" style="--dc-accent:#FF3D5E">
+        <div class="disease-icon" style="background:var(--red-dim);color:var(--red);">💠</div>
+        <div class="disease-name">Cataract</div>
+        <div class="disease-desc">Clouding of the eye's natural lens — the leading cause of blindness worldwide.</div>
+      </div>
+      <div class="disease-card" style="--dc-accent:#00D2FF">
+        <div class="disease-icon" style="background:var(--cyan-dim);color:var(--cyan);">👁</div>
+        <div class="disease-name">Conjunctivitis</div>
+        <div class="disease-desc">Inflammation or infection of the outer membrane — commonly called "pink eye".</div>
+      </div>
+      <div class="disease-card" style="--dc-accent:#FFB800">
+        <div class="disease-icon" style="background:rgba(255,184,0,.1);color:#FFB800;">✦</div>
+        <div class="disease-name">Eyelid Disorders</div>
+        <div class="disease-desc">Drooping, tumors, or structural abnormalities of the eyelid.</div>
+      </div>
+      <div class="disease-card" style="--dc-accent:#00F5A0">
+        <div class="disease-icon" style="background:var(--green-dim);color:var(--green);">✓</div>
+        <div class="disease-name">Normal Eye</div>
+        <div class="disease-desc">No signs of disease detected. Healthy ocular structure confirmed.</div>
+      </div>
+      <div class="disease-card" style="--dc-accent:#A855F7">
+        <div class="disease-icon" style="background:var(--purple-dim);color:var(--purple);">◈</div>
+        <div class="disease-name">Uveitis</div>
+        <div class="disease-desc">Inflammation of the uvea — the middle layer of the eye wall.</div>
+      </div>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🧠</span>
+        <div class="feature-title">Deep Learning Core</div>
+        <div class="feature-desc">Built on MobileNetV2 architecture, fine-tuned on clinical ophthalmology datasets for real-world accuracy.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📄</span>
+        <div class="feature-title">PDF Report Export</div>
+        <div class="feature-desc">Generate professional medical-grade reports with diagnosis, confidence scores, and clinical advice.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🤖</span>
+        <div class="feature-title">AI Consultation</div>
+        <div class="feature-desc">Chat with a Claude-powered AI doctor for follow-up questions and personalised guidance.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DETECTION ═══ -->
+<div id="detection" class="page">
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <div class="mono-label">02 — Diagnosis Module</div>
+        <h2>Eye Disease Detection</h2>
+      </div>
+      <div class="chip">◉ &nbsp;Model Ready</div>
+    </div>
+    <div class="separator"></div>
+
+    <div class="detection-layout">
+      <!-- LEFT COLUMN -->
+      <div>
+        <!-- Upload Panel -->
+        <div id="uploadPanel">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-dot"></div>
+              <div class="panel-title">Image Input</div>
+            </div>
+            <div class="panel-body">
+              <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                <div class="uz-icon">🔬</div>
+                <div class="uz-title">Upload Retinal Image</div>
+                <div class="uz-sub">Drag &amp; drop or click to browse<br>Ensure eye is clearly visible</div>
+                <div class="format-badges">
+                  <span class="fmt-badge">JPG</span>
+                  <span class="fmt-badge">PNG</span>
+                  <span class="fmt-badge">JPEG</span>
+                </div>
+              </div>
+              <input type="file" id="fileInput" accept="image/*" style="display:none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div id="previewPanel" style="display:none;">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-dot amber"></div>
+              <div class="panel-title">Image Preview</div>
+            </div>
+            <div class="panel-body">
+              <div class="preview-wrap">
+                <img id="previewImage" class="preview" alt="Selected Eye Image">
+              </div>
+              <div class="action-row mt16">
+                <button class="btn btn-cyan" onclick="analyzeImage()">◎ &nbsp;Analyze Image</button>
+                <button class="btn btn-outline btn-sm" onclick="resetDetection()">↺ &nbsp;Choose Another</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading Panel -->
+        <div id="loadingPanel" style="display:none;">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-dot" style="animation:blink .5s infinite;"></div>
+              <div class="panel-title">Scanning...</div>
+            </div>
+            <div class="panel-body">
+              <div class="scan-container">
+                <div class="scan-ring">
+                  <svg viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="50" r="42" stroke="rgba(0,210,255,.1)" stroke-width="4"/>
+                    <path d="M50 8 A42 42 0 0 1 92 50" stroke="url(#sg)" stroke-width="4" stroke-linecap="round"/>
+                    <defs>
+                      <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#00D2FF" stop-opacity="0"/>
+                        <stop offset="100%" stop-color="#00D2FF"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="scan-inner">👁</div>
+                </div>
+                <div class="scan-label">Analyzing Retinal Image</div>
+                <div class="scan-sub">Running inference through neural network...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analyzed Image Panel -->
+        <div id="resultImagePanel" style="display:none;">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-dot green"></div>
+              <div class="panel-title">Analyzed Image</div>
+            </div>
+            <div class="panel-body">
+              <div class="result-wrap">
+                <div class="scan-line"></div>
+                <div class="corner c-tl"></div><div class="corner c-tr"></div>
+                <div class="corner c-bl"></div><div class="corner c-br"></div>
+                <img id="resultImage" class="preview" alt="Analyzed Image">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Empty state -->
+      <div id="emptyRight">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-dot dim"></div>
+            <div class="panel-title" style="color:var(--text-faint);">Awaiting Scan</div>
+          </div>
+          <div class="panel-body">
+            <div class="empty-state">
+              <div style="font-size:52px;opacity:.12;">◎</div>
+              <div class="mono-label">Results will appear here</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Results -->
+      <div id="resultsPanel" style="display:none;">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-dot" id="resultDot"></div>
+            <div class="panel-title">Diagnosis Results</div>
+          </div>
+          <div class="panel-body">
+            <div id="diagnosisBadge" class="diag-badge"></div>
+            <div class="conf-row">
+              <span>Confidence Score</span>
+              <span id="confPct" style="color:var(--cyan);">—</span>
+            </div>
+            <div class="conf-track">
+              <div class="conf-fill" id="confFill"></div>
+            </div>
+            <div class="mono-label" style="margin-bottom:12px;">Probability Breakdown</div>
+            <div class="prob-grid" id="probGrid"></div>
+            <div class="advice-box">
+              <div class="advice-header">✦ &nbsp;Clinical Recommendation</div>
+              <div class="advice-body" id="aiAdvice"></div>
+            </div>
+            <div class="action-row">
+              <button class="btn btn-cyan btn-sm" onclick="downloadPDFReport()">📄 &nbsp;PDF Report</button>
+              <button class="btn btn-outline btn-sm" onclick="speakAdvice()">🔊 &nbsp;Voice Advice</button>
+              <button class="btn btn-purple btn-sm" onclick="askQuestion()">✦ &nbsp;AI Doctor</button>
+              <button class="btn btn-danger btn-sm" onclick="resetDetection()">↺ &nbsp;New Scan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHAT ═══ -->
+<div id="chat" class="page">
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <div class="mono-label">03 — AI Consultation</div>
+        <h2>Chat with AI Eye Doctor</h2>
+      </div>
+      <div class="chip">◉ &nbsp;Online</div>
+    </div>
+    <div class="separator"></div>
+    <div class="chat-wrap">
+      <div class="chat-window">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg bot">
+            <div class="msg-av bot">👁</div>
+            <div class="msg-bubble">
+              Hello! I'm <strong>Dr. EyeTrust AI</strong> — your virtual ophthalmology consultant. I can help you understand eye conditions, interpret your diagnosis, explain symptoms, and answer questions about eye health.<br><br>How can I assist you today?
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput()" title="Voice Input">🎤</button>
+          <input type="text" class="chat-input" id="chatInput" placeholder="Ask me about your eye health..." onkeypress="if(event.key==='Enter') sendMessage()">
+          <button class="btn btn-cyan" style="padding:10px 22px;font-size:13px;" onclick="sendMessage()">Send →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-left">
+    <div class="footer-logo">Eye<span>Trust</span> AI</div>
+    <div style="width:1px;height:14px;background:var(--border);"></div>
+    <div class="footer-copy">© 2026 — Final Year Project</div>
+  </div>
+  <div class="footer-disc">
+    <strong>⚠ Medical Disclaimer:</strong> This tool is for educational and research purposes only. Always consult a licensed ophthalmologist for clinical decisions.
+  </div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
